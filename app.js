@@ -7,13 +7,29 @@ let middleImg = document.getElementById('middleImg');
 let result = document.getElementById('results');
 let busImages = ['bag.jpg', 'banana.jpg', 'bathroom.jpg', 'boots.jpg', 'breakfast.jpg', 'bubblegum.jpg', 'chair.jpg', 'cthulhu.jpg', 'dog-duck.jpg', 'dragon.jpg', 'pen.jpg', 'pet-sweep.jpg', 'scissors.jpg', 'shark.jpg', 'sweep.png', 'tauntaun.jpg', 'unicorn.jpg', 'water-can.jpg', 'wine-glass.jpg'];
 
-
 let maxAttempts = 25;
 let attempt = 1;
 let bus = [];
 let aNames = [];
 let vote = [];
 let view = [];
+
+let ulEl = document.getElementById('bus');
+
+function saveToLocalStorage(){
+    let data = JSON.stringify(bus);
+    localStorage.setItem('busMall', data);
+}
+function readFromLocalStorage(){
+    let stringObject = localStorage.getItem('busMall');
+    let normalObject = JSON.parse(stringObject);
+
+    if(normalObject){
+        bus = normalObject;
+        renderImg();
+    }
+}
+
 
 function BusImages(busName) {
     this.bName = busName.split('.')[0];
@@ -30,7 +46,6 @@ for (let i = 0; i < busImages.length; i++) {
     new BusImages(busImages[i]);
     console.log(busImages[i]);
 }
-console.log(bus);
 
 function randomImage() {
     return Math.floor(Math.random() * bus.length);
@@ -41,6 +56,7 @@ let rightIndex;
 let middleIndex;
 let ran=[];
 function renderImg() {
+   
     
     while (leftIndex === middleIndex ||
         middleIndex === rightIndex ||
@@ -71,6 +87,7 @@ rightImg.addEventListener('click', clickHandler);
 middleImg.addEventListener('click', clickHandler);
 
 function clickHandler(event) {
+   
     if (attempt <= maxAttempts) {
         let clickedImage = event.target.id;
         if (clickedImage === 'leftImg') {
@@ -81,9 +98,8 @@ function clickHandler(event) {
             bus[middleIndex].votes++;
         }
         renderImg();
-        console.log(bus);
         attempt++;
-
+        saveToLocalStorage();
 
     } else {
 
@@ -92,16 +108,20 @@ function clickHandler(event) {
         middleImg.removeEventListener('click', clickHandler);
 
     }
-
+    
 }
 
 function showingResult() {
+    
     for (let i = 0; i < bus.length; i++) {
         let liEl = document.createElement('li');
         result.appendChild(liEl);
         liEl.textContent = `${bus[i].bName} has ${bus[i].votes} votes and  ${bus[i].views} views.`;
         vote.push(bus[i].votes);
         view.push(bus[i].views);
+
+     
+       
     }
     chartRender();
 }
@@ -144,4 +164,4 @@ function chartRender() {
         }
     });
 }
-
+readFromLocalStorage();
